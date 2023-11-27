@@ -1,12 +1,8 @@
 import EditTopicForm from '@/components/EditTopicForm'
-import React from 'react'
-
 const getTopicById = async (id) => {
-  const apiUrl = process.env.API_URL
   try {
-    const res = await fetch(`${apiUrl}/api/topics/${id}`, {
+    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
       cache: 'no-store',
-      method: 'GET',
     })
     if (!res.ok) {
       throw new Error('Failed to fetch topic.')
@@ -16,11 +12,9 @@ const getTopicById = async (id) => {
     console.log(error)
   }
 }
-
-export default async function EditTopicPage({ params }) {
+export default async function EditTopic({ params }) {
   const { id } = params
   const { topic } = await getTopicById(id)
   const { title, description } = topic
-
   return <EditTopicForm id={id} title={title} description={description} />
 }
