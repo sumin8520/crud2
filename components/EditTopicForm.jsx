@@ -1,27 +1,57 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import React from 'react'
-import { HiOutlineTrash } from 'react-icons/hi'
+import React, { useState } from 'react'
 
-export default function RemoveBtn({ id }) {
+export default function EditTopicForm({ id, title, description }) {
+  const [newTitle, setNewTitle] = useState(title)
+  const [newDescription, setNewDescription] = useState(description)
+
   const router = useRouter()
 
-  const removeTopic = async () => {
-    const confirmed = confirm(`Are you sure to delete ${id}?`)
-    if (confirmed) {
-      const res = await fetch(`/api/topics?id=${id}`, {
-        method: 'DELETE',
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const res = await fetch(`/api/topics/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newTitle, newDescription }),
       })
-      if (res.ok) {
-        router.refresh()
+      if (!res.ok) {
+        throw new Error('Failed to update topic')
       }
+      router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.log(error)
     }
   }
 
   return (
-    <button onClick={removeTopic} className="text-red-400">
-      <HiOutlineTrash size={24} />
-    </button>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <input
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+        type="text"
+        placeholder="Topic Title"
+        className="border border-slate-500 p-4"
+      />
+      <textarea
+        value={newDescription}
+        onChange={(e) => setNewDescription(e.target.value)}
+        type="text"
+        placeholder="Topic description"
+        className="border border-slate-500 p-4 h-32"
+      />
+      <button
+        type="submit"
+        className="bg-green-800 text-white font-bold px-6 py-3 w-fit rounded-md"
+      >
+        Update Topic
+      </button>
+    </form>
   )
 }
